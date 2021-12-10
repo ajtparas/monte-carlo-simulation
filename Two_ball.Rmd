@@ -189,5 +189,73 @@ martingale_twoball(100000)
 ```
 Expected winnings per game is $-97.63 and the expected number of plays per iteration of the martingale system is ~19.18 plays.
 
+```{r}
+# expected winnings and plays as initial earnings per game raises
+
+orig_two_ball_earning <- function(earn){
+  winnings <- c()
+  
+  numbers <- seq(0,36)
+  even <- seq(2,36,2)
+  odd <- seq(1,36,2)
+    
+  ball_one <- sample(numbers, 1, replace = FALSE)
+  ball_two <- sample(numbers, 1, replace = FALSE)
+  
+  if(ball_one %in% odd & ball_two %in% even) {
+    winnings <- c(winnings, earn)
+  } else {
+    winnings <- c(winnings, -1)
+  }
+  return(winnings)
+}
+
+
+martingale_twoball_earning <- function(max_initial_earning, n) {
+  
+  winnings_distribution <- c()
+  plays_distribution <- c()
+  
+  for (x in 1:max_initial_earning){
+    
+  win_cases <- c()
+  plays_cases <- c()
+  
+  for(i in 1:n){ 
+  win_amount <- 0
+  plays <- 0
+  bet_amount <- 1
+  
+  while (win_amount < 10 && bet_amount < 100) {
+      winnings = orig_two_ball_earning(x) 
+    if (winnings == -1) {
+      win_amount = win_amount - bet_amount
+      bet_amount = bet_amount * 2
+    }
+    else{
+      win_amount = win_amount + bet_amount
+      bet_amount = 1
+    }
+    plays = plays + 1
+  }
+  win_cases <- c(win_cases, win_amount)
+  plays_cases <- c(plays_cases,plays)
+  } # end i
+ winnings_distribution <- c(winnings_distribution, mean(win_cases))
+ plays_distribution <- c(plays_distribution, mean(plays_cases))
+  
+  } # end max initial earning
+   earnings <- seq(1:max_initial_earning)
+ data <- data.frame(earnings, winnings_distribution, plays_distribution)
+  return(data)
+}
+
+x <- martingale_twoball_earning(100,10000)
+
+plot(x$earnings, x$winnings_distribution,main = "Two-ball Martingale: Expected Earnings Distribution as initial Earnings Raises", type = "l")
+
+plot(x$earnings, x$plays_distribution, main = "Two-ball Martingale: Expected # of plays as initial earnings raise", type = "l")
+
+```
 
 
