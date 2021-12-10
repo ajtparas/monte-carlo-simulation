@@ -1,0 +1,193 @@
+---
+title: "two_ball"
+author: "Aldrich Paras"
+date: "12/8/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# ODD AND EVEN
+
+
+```{r}
+# simulate odd AND even
+# First ball must be odd and second ball must be even
+# $1 bet, if win then win $2, if lose then lose $1
+
+
+# expected winnings per game
+two_ball <- function(n){
+  winnings <- c()
+  
+  numbers <- seq(0,36)
+  even <- seq(2,36,2)
+  odd <- seq(1,36,2)
+  
+  for(i in 1:n){
+    
+  ball_one <- sample(numbers, 1, replace = FALSE)
+  ball_two <- sample(numbers, 1, replace = FALSE)
+  
+  if(ball_one %in% odd & ball_two %in% even) {
+    winnings <- c(winnings, 2)
+  } else {
+    winnings <- c(winnings, -1)
+  }
+  }
+  
+  expected <- mean(winnings)
+  
+  return(expected)
+}
+two_ball(100000)
+
+
+```
+The expected winnings per game for betting on even AND odd with $1 bet, winning $2 and losing $1 is -.29536
+
+
+
+```{r}
+library(ggplot2 )
+# How much do you have to increase wiwnnings to gain positive expected earnings
+
+pos_earning <- function(max_earnings, n){
+  
+  max_earnings <- seq(.5, max_earnings,.5)
+  expected_earning <- c()
+  
+  numbers <- seq(0,36)
+  even <- seq(2,36,2)
+  odd <- seq(1,36,2)
+  
+  for (x in max_earnings){
+    
+    winnings <- c()
+    
+      for(i in 1:n){
+      
+      ball_one <- sample(numbers, 1, replace = FALSE)
+      ball_two <- sample(numbers, 1, replace = FALSE)
+      
+      if(ball_one %in% odd & ball_two %in% even) {
+        winnings <- c(winnings, x)
+      } else {
+        winnings <- c(winnings, -1)
+      }
+      }
+    expected <- mean(winnings)
+    expected_earning <- c(expected_earning, expected)
+    
+  }
+  data <- data.frame(max_earnings,expected_earning)
+  
+  return(data)
+}
+
+x <- pos_earning(10,10000)
+x
+
+  
+ggplot(x, aes(max_earnings, expected_earning)) +  geom_line() + geom_point() + ggtitle("Two-Ball Roulette: Expected Earnings as Payout Increases") + xlab("Payout (in $)") +ylab("Expected Value (in $)") + geom_hline( yintercept = 0, color = "green")
+```
+For two ball roulette starting at $.5 earnings per game incrementing at +$.5 until $10 with a constant loss of $1, expected winnings will be > $0 when earnings is $3.50.
+
+```{r}
+# Proportions of games you win 
+
+prop_win <- function(n){
+  
+  numbers <- seq(0,36)
+  even <- seq(2,36,2)
+  odd <- seq(1,36,2)
+  
+  winnings <- c()
+    
+   for(i in 1:n){
+      
+      ball_one <- sample(numbers, 1, replace = FALSE)
+      ball_two <- sample(numbers, 1, replace = FALSE)
+      
+      if(ball_one %in% odd & ball_two %in% even) {
+        winnings <- c(winnings, 1)
+      } else {
+        winnings <- c(winnings, 0)
+      }
+      }
+    
+    prop <- (length(winnings[winnings == 1]))/ (length(winnings))
+
+  
+  return(prop)
+}
+
+proportion <-  prop_win(10000)
+proportion
+```
+With two ball roulette where the first ball must be odd and the second must be even, the proportion of games won is ~ 23.92%.
+
+
+
+```{r}
+# Martingale Strategy Two ball for starting winning = $3 and loss = $1
+
+
+orig_two_ball <- function(){
+  winnings <- c()
+  
+  numbers <- seq(0,36)
+  even <- seq(2,36,2)
+  odd <- seq(1,36,2)
+    
+  ball_one <- sample(numbers, 1, replace = FALSE)
+  ball_two <- sample(numbers, 1, replace = FALSE)
+  
+  if(ball_one %in% odd & ball_two %in% even) {
+    winnings <- c(winnings, 3)
+  } else {
+    winnings <- c(winnings, -1)
+  }
+  return(winnings)
+}
+
+
+martingale_twoball <- function(n) {
+  win_cases <- c()
+  plays_cases <- c()
+  
+  for(i in 1:n){ 
+  win_amount <- 0
+  plays <- 0
+  bet_amount <- 1
+  
+  while (win_amount < 10 && bet_amount < 100) {
+      winnings = orig_two_ball() 
+    if (winnings == -1) {
+      win_amount = win_amount - bet_amount
+      bet_amount = bet_amount * 2
+    }
+    else{
+      win_amount = win_amount + bet_amount
+      bet_amount = 1
+    }
+    plays = plays + 1
+  }
+  win_cases <- c(win_cases, win_amount)
+  plays_cases <- c(plays_cases,plays)
+  }
+  expected_earnings <- mean(win_cases)
+  expected_plays <- mean(plays_cases)
+  
+  return(c(expected_earnings, expected_plays))
+}
+
+martingale_twoball(100000)
+```
+Expected winnings per game is $-97.63 and the expected number of plays per iteration of the martingale system is ~19.18 plays.
+
+
+
