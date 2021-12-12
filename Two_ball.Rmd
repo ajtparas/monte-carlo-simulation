@@ -136,20 +136,20 @@ With two ball roulette where the first ball must be odd and the second must be e
 # Martingale Strategy Two ball for starting winning = $3 and loss = $1
 
 
-orig_two_ball <- function(){
+orig_two_ball <- function() {
   winnings <- c()
   
-  numbers <- seq(0,36)
-  even <- seq(2,36,2)
-  odd <- seq(1,36,2)
-    
+  numbers <- seq(0, 36)
+  even <- seq(2, 36, 2)
+  odd <- seq(1, 36, 2)
+  
   ball_one <- sample(numbers, 1, replace = FALSE)
   ball_two <- sample(numbers, 1, replace = FALSE)
   
-  if(ball_one %in% odd & ball_two %in% even) {
+  if (ball_one %in% odd & ball_two %in% even) {
     winnings <- c(winnings, 3)
   } else {
-    winnings <- c(winnings, -1)
+    winnings <- c(winnings,-1)
   }
   return(winnings)
 }
@@ -159,25 +159,25 @@ martingale_twoball <- function(n) {
   win_cases <- c()
   plays_cases <- c()
   
-  for(i in 1:n){ 
-  win_amount <- 0
-  plays <- 0
-  bet_amount <- 1
-  
-  while (win_amount < 10 && bet_amount < 100) {
-      winnings = orig_two_ball() 
-    if (winnings == -1) {
-      win_amount = win_amount - bet_amount
-      bet_amount = bet_amount * 2
+  for (i in 1:n) {
+    win_amount <- 0
+    plays <- 0
+    bet_amount <- 1
+    
+    while (win_amount < 10 && bet_amount < 100) {
+      winnings = orig_two_ball()
+      if (winnings == -1) {
+        win_amount = win_amount - bet_amount
+        bet_amount = bet_amount * 2
+      }
+      else{
+        win_amount = win_amount + bet_amount
+        bet_amount = 1
+      }
+      plays = plays + 1
     }
-    else{
-      win_amount = win_amount + bet_amount
-      bet_amount = 1
-    }
-    plays = plays + 1
-  }
-  win_cases <- c(win_cases, win_amount)
-  plays_cases <- c(plays_cases,plays)
+    win_cases <- c(win_cases, win_amount)
+    plays_cases <- c(plays_cases, plays)
   }
   expected_earnings <- mean(win_cases)
   expected_plays <- mean(plays_cases)
@@ -192,70 +192,329 @@ Expected winnings per game is $-97.63 and the expected number of plays per itera
 ```{r}
 # expected winnings and plays as initial earnings per game raises
 
-orig_two_ball_earning <- function(earn){
+orig_two_ball_earning <- function(earn) {
   winnings <- c()
   
-  numbers <- seq(0,36)
-  even <- seq(2,36,2)
-  odd <- seq(1,36,2)
-    
+  numbers <- seq(0, 36)
+  even <- seq(2, 36, 2)
+  odd <- seq(1, 36, 2)
+  
   ball_one <- sample(numbers, 1, replace = FALSE)
   ball_two <- sample(numbers, 1, replace = FALSE)
   
-  if(ball_one %in% odd & ball_two %in% even) {
+  if (ball_one %in% odd & ball_two %in% even) {
     winnings <- c(winnings, earn)
   } else {
-    winnings <- c(winnings, -1)
+    winnings <- c(winnings,-1)
   }
   return(winnings)
 }
 
 
 martingale_twoball_earning <- function(max_initial_earning, n) {
-  
   winnings_distribution <- c()
   plays_distribution <- c()
   
-  for (x in 1:max_initial_earning){
+  for (x in 1:max_initial_earning) {
+    win_cases <- c()
+    plays_cases <- c()
     
-  win_cases <- c()
-  plays_cases <- c()
-  
-  for(i in 1:n){ 
-  win_amount <- 0
-  plays <- 0
-  bet_amount <- 1
-  
-  while (win_amount < 10 && bet_amount < 100) {
-      winnings = orig_two_ball_earning(x) 
-    if (winnings == -1) {
-      win_amount = win_amount - bet_amount
-      bet_amount = bet_amount * 2
-    }
-    else{
-      win_amount = win_amount + bet_amount
-      bet_amount = 1
-    }
-    plays = plays + 1
-  }
-  win_cases <- c(win_cases, win_amount)
-  plays_cases <- c(plays_cases,plays)
-  } # end i
- winnings_distribution <- c(winnings_distribution, mean(win_cases))
- plays_distribution <- c(plays_distribution, mean(plays_cases))
-  
+    for (i in 1:n) {
+      win_amount <- 0
+      plays <- 0
+      bet_amount <- 1
+      
+      while (win_amount < 10 && bet_amount < 100) {
+        winnings = orig_two_ball_earning(x)
+        if (winnings == -1) {
+          win_amount = win_amount - bet_amount
+          bet_amount = bet_amount * 2
+        }
+        else{
+          win_amount = win_amount + bet_amount
+          bet_amount = 1
+        }
+        plays = plays + 1
+      }
+      win_cases <- c(win_cases, win_amount)
+      plays_cases <- c(plays_cases, plays)
+    } # end i
+    winnings_distribution <- c(winnings_distribution, mean(win_cases))
+    plays_distribution <- c(plays_distribution, mean(plays_cases))
+    
   } # end max initial earning
-   earnings <- seq(1:max_initial_earning)
- data <- data.frame(earnings, winnings_distribution, plays_distribution)
+  earnings <- seq(1:max_initial_earning)
+  data <-
+    data.frame(earnings, winnings_distribution, plays_distribution)
   return(data)
 }
 
-x <- martingale_twoball_earning(100,10000)
+x <- martingale_twoball_earning(100, 10000)
 
-plot(x$earnings, x$winnings_distribution,main = "Two-ball Martingale: Expected Earnings Distribution as initial Earnings Raises", type = "l")
+plot(
+  x$earnings,
+  x$winnings_distribution,
+  main = "Two-ball Martingale: Expected Earnings Distribution as initial Earnings Raises",
+  type = "l",
+  ylab = "Expected Earnings",
+  xlab = "Initial Earnings"
+)
 
-plot(x$earnings, x$plays_distribution, main = "Two-ball Martingale: Expected # of plays as initial earnings raise", type = "l")
+plot(
+  x$earnings,
+  x$plays_distribution,
+  main = "Two-ball Martingale: Expected # of plays as initial earnings raise",
+  type = "l",
+  ylab = "Number of Plays",
+  xlab = "Initial Earnings"
+)
 
 ```
+
+
+```{r}
+# Two-Ball labouchere system for odd and even
+
+# starting with initial list of 1,2,3,4
+# expected wins 
+
+
+labouchere <- function(n) {
+  cases_wins <- c()
+  
+  for (i in 1:n) {
+    list_game = c(1, 2, 3, 4)
+    winnings <- 0
+    bet_amount = list_game[1] + list_game[length(list_game)]
+    number_bets <- 0
+    
+    
+    
+    while (length(list_game) >= 1 && bet_amount < 100) {
+      # odd and even play
+      numbers <- seq(0, 36)
+      even <- seq(2, 36, 2)
+      odd <- seq(1, 36, 2)
+      
+      ball_one <- sample(numbers, 1, replace = FALSE)
+      ball_two <- sample(numbers, 1, replace = FALSE)
+      
+      if (ball_one %in% odd & ball_two %in% even) {
+        current_winnings <- bet_amount
+      } else {
+        current_winnings <- -bet_amount
+      }
+      
+      
+      if (current_winnings > 0) {
+        winnings = winnings + current_winnings
+        #remove one from each side of list
+        list_game = list_game[-c(1, length(list_game))]
+        
+        if (length(list_game) == 1) {
+          bet_amount <- list_game[1]
+          
+        } else {
+          bet_amount <- list_game[1] + list_game[length(list_game)]
+        }
+      } else {
+        winnings = winnings + current_winnings
+        list_game = c(list_game, abs(current_winnings))
+        bet_amount = list_game[1] + list_game[length(list_game)]
+      }
+      
+      number_bets = number_bets + 1
+      
+    }
+    
+    cases_wins <- c(cases_wins, winnings)
+    
+  } # end for loop
+  
+  expected_earnings <- mean(cases_wins)
+  
+  return (expected_earnings)
+  
+}
+
+labouchere(10000)
+
+```
+
+expected earnings for labouchere with two balls odd and even is  -494.0207. This is expected because the chance to win the two ball is so much lower than regular one ball odd or even.
+
+```{r}
+
+# proportion of wins for Labouchere System
+
+labouchere_prop <- function(n) {
+  cases_wins <- c()
+  
+  for (i in 1:n) {
+    list_game = c(1, 2, 3, 4)
+    winnings <- 0
+    bet_amount = list_game[1] + list_game[length(list_game)]
+    
+    
+    while (length(list_game) >= 1 && bet_amount < 100) {
+      # odd and even play
+      numbers <- seq(0, 36)
+      even <- seq(2, 36, 2)
+      odd <- seq(1, 36, 2)
+      
+      ball_one <- sample(numbers, 1, replace = FALSE)
+      ball_two <- sample(numbers, 1, replace = FALSE)
+      
+      if (ball_one %in% odd && ball_two %in% even) {
+        current_winnings <- bet_amount
+      } else {
+        current_winnings <- -bet_amount
+      }
+      
+      
+      if (current_winnings > 0) {
+        winnings = winnings + current_winnings
+        #remove one from each side of list
+        list_game = list_game[-c(1, length(list_game))]
+        
+        if (length(list_game) == 1) {
+          bet_amount <- list_game[1]
+          
+        } else {
+          bet_amount <- list_game[1] + list_game[length(list_game)]
+        }
+      } else {
+        winnings = winnings + current_winnings
+        list_game = c(list_game, abs(current_winnings))
+        bet_amount = list_game[1] + list_game[length(list_game)]
+      }
+      
+    }
+    
+    cases_wins <- c(cases_wins, winnings)
+    
+  } # end for loop
+  
+  expected_earnings <- mean(cases_wins)
+  prop <- length(cases_wins[cases_wins == 10]) / length(cases_wins)
+  
+  return (prop)
+  
+}
+
+labouchere_prop(10000)
+
+
+
+```
+proportion of wins for labouchere two ball is .2359. Also expected to be lower since it is harder to convert on winning a two ball bet.
+
+
+```{r}
+# expected winnings by changing list of numbers ( e.g. - play games w initial list of (1,2,3), then (2,3,4) and so on. (all the way up to (34,35,36)).
+
+
+labouchere_list <- function(n, initial_list_max) {
+  # create initial lists
+  
+  expected_earnings <- c()
+  plays_distribution <- c()
+  
+  for (x in 1:initial_list_max) {
+    cases_wins <- c()
+    cases_plays <- c()
+    
+    for (i in 1:n) {
+      list_game = c(x, x + 1, x + 2, x + 3)
+      winnings <- 0
+      bet_amount = list_game[1] + list_game[length(list_game)]
+      number_plays <- 0
+      
+      
+      
+      while (length(list_game) >= 1 && bet_amount < 100) {
+        # odd and even play
+        numbers <- seq(0, 36)
+        even <- seq(2, 36, 2)
+        odd <- seq(1, 36, 2)
+        
+        ball_one <- sample(numbers, 1, replace = FALSE)
+        ball_two <- sample(numbers, 1, replace = FALSE)
+        
+        if (ball_one %in% odd & ball_two %in% even) {
+          current_winnings <- bet_amount
+        } else {
+          current_winnings <- -bet_amount
+        }
+        
+        
+        if (current_winnings > 0) {
+          winnings = winnings + current_winnings
+          #remove one from each side of list
+          list_game = list_game[-c(1, length(list_game))]
+          
+          if (length(list_game) == 1) {
+            bet_amount <- list_game[1]
+            
+          } else {
+            bet_amount <- list_game[1] + list_game[length(list_game)]
+          }
+        } else {
+          winnings = winnings + current_winnings
+          list_game = c(list_game, abs(current_winnings))
+          bet_amount = list_game[1] + list_game[length(list_game)]
+        }
+        
+        number_plays = number_plays + 1
+        
+      }
+      
+      cases_wins <- c(cases_wins, winnings)
+      cases_plays <- c(cases_plays, number_plays)
+    } # end for loop simulation
+    
+    expected_e <- mean(cases_wins)
+    expected_p <- mean(cases_plays)
+    
+    expected_earnings <- c(expected_earnings, expected_e)
+    plays_distribution <- c(plays_distribution , expected_p)
+    
+  } # end list index
+  
+  df <- data.frame(expected_earnings, plays_distribution)
+  
+  return (df)
+  
+}
+
+x <- labouchere_list(10000, 10)
+
+
+plot(
+  seq(1:10),
+  x$expected_earnings,
+  type = "l",
+  ylab = "Expected Earnings",
+  xlab = "Initial List (1 = c(1,2,3,4))",
+  main = "Two-ball Labouchere System Expected Earnings vs Initial List"
+)
+
+plot(
+  seq(1:10),
+  x$plays_distribution,
+  type = "l",
+  ylab = "Number of Plays",
+  xlab = "Initial List (1 = c(1,2,3,4))",
+  main = "Two-ball Labouchere System PLays Distribution vs Initial List"
+)
+
+```
+
+calculate expected earnings per initial list( 1 = (1,2,3,4), 2 = (2,3,4,5), 3 = (3,4,5,6) and so on)
+
+
+
+
+
 
 
