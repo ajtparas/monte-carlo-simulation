@@ -1,0 +1,339 @@
+---
+title: "One_ball"
+author: "Nancy Paul"
+date: "12/02/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#betting on red
+
+bet_red <- function() {
+  win_amount = sample(c(1, -1), 1, replace = TRUE, prob = c(18 / 37, 19 / 37))
+  number_of_bet <- 1
+  return (c(win_amount, number_of_bet))
+}
+
+prop_bet_red <- function() { #proportion of wins
+  wins <- 0
+  gamecounter <- 1
+  while (gamecounter <= 100000) {
+    if (bet_red()[1] == 1) {
+      wins = wins + 1
+    }
+    gamecounter = gamecounter + 1
+  }
+  return (wins / 100000)
+}
+
+exp_bet_red <- function() { #expected winnings
+  total_win <- 0
+  gamecounter <- 1
+  while (gamecounter <= 100000) {
+    total_win = total_win + bet_red()[1]
+    gamecounter = gamecounter + 1
+  }
+  return (total_win / 100000)
+}
+
+bet_red()
+prop_bet_red()
+exp_bet_red()
+```
+
+```{r}
+#betting on a single number
+
+bet_no <- function() { #winnings and bets
+  win_amount = sample(c(35, -1), 1, replace = TRUE, prob = c(1 / 37 , 36 / 37))
+  number_of_bet <- 1
+  return (c(win_amount, number_of_bet))
+}
+
+prop_bet_no <- function() { #proportion of wins
+  wins <- 0
+  gamecounter <- 1
+  while (gamecounter <= 100000) {
+    if (bet_no()[1] == 35) {
+      wins = wins + 1
+    }
+    gamecounter = gamecounter + 1
+  }
+  return (wins / 100000)
+}
+
+exp_bet_no <- function() { #expected winnings
+  total_win <- 0
+  gamecounter <- 1
+  while (gamecounter <= 100000) {
+    total_win = total_win + bet_no()[1]
+    gamecounter = gamecounter + 1
+  }
+  return (total_win / 100000)
+}
+
+bet_no()
+prop_bet_no()
+exp_bet_no()
+```
+
+```{r}
+#martingale betting strategy 
+
+bet_martingale <- function() {
+  win_amount <- 0
+  number_bets <- 0
+  bet_amount <- 1
+  while (win_amount < 10 && bet_amount < 100) {
+    current_winnings = bet_red()[1] 
+    if (current_winnings == -1) {
+      win_amount = win_amount - bet_amount
+      bet_amount = bet_amount * 2
+    }
+    else{
+      win_amount = win_amount + bet_amount
+      bet_amount = 1
+    }
+    number_bets = number_bets + 1
+  }
+  return(c(win_amount, number_bets))
+}
+
+exp_bet_martingale <- function() { #expected winnings
+  counter <- 1
+  win_amount <- 0
+  while (counter <= 100000) {
+    win_amount = win_amount + bet_martingale()[1]
+    counter = counter + 1
+  }
+  return (win_amount / 100000)
+}
+
+prop_bet_martingale <- function() { #proportion of wins
+  counter <- 1
+  win_amount <- 0
+  number_of_wins <- 0
+  while (counter <= 100000) {
+    win_amount = bet_martingale()[1]
+    if (win_amount == 10) {
+      number_of_wins = number_of_wins + 1
+    }
+    counter = counter + 1
+  }
+  return (number_of_wins / 100000)
+}
+
+bet_martingale()
+exp_bet_martingale()
+prop_bet_martingale()
+```
+
+```{r}
+#labouchere betting strategy 
+
+bet_labouchere <- function() {
+  list_game = c(1, 2, 3, 4)
+  win_amount <- 0
+  bet_amount = list_game[1] + list_game[length(list_game)]
+  number_bets <- 0
+  while (length(list_game) >= 1 && bet_amount < 100) {
+    current_winnings <-
+      sample(c(-bet_amount, bet_amount), 1, replace = T, prob = c(19 / 37, 18 / 37))
+    if (current_winnings > 0) {
+      win_amount = win_amount + current_winnings
+      list_game = list_game[-c(1, length(list_game))]
+      if (length(list_game) == 1) {
+        bet_amount <- list_game[1]
+      }
+      else {
+        bet_amount <- list_game[1] + list_game[length(list_game)]
+      }
+    }
+    else{
+      win_amount = win_amount + current_winnings
+      list_game = c(list_game, abs(current_winnings))
+      bet_amount = list_game[1] + list_game[length(list_game)]
+    }
+    number_bets = number_bets + 1
+  }
+  return (c(win_amount, number_bets))
+}
+
+exp_bet_labouchere <- function() { #expected winnings
+  counter <- 1
+  win_amount <- 0
+  while (counter <= 100000) {
+    win_amount = win_amount + bet_labouchere()[1]
+    counter = counter + 1
+  }
+  return (win_amount / 100000)
+}
+
+prop_bet_labouchere <- function() { #proportion of wins
+  counter <- 1
+  win_amount <- 0
+  number_of_wins <- 0
+  while (counter <= 100000) {
+    win_amount = bet_labouchere()[1]
+    if (win_amount == 10) {
+      number_of_wins = number_of_wins + 1
+    }
+    counter = counter + 1
+  }
+  return (number_of_wins / 100000)
+}
+
+bet_labouchere()
+exp_bet_labouchere()
+prop_bet_labouchere()
+```
+
+```{r}
+#summary report of expected winnings, proportions of wins, and playing time for game 1 and game 2
+
+red <-function(){
+  red_expwins = replicate(5, exp_bet_red()[1])
+  red_propwins = replicate(5, prop_bet_red())
+  red_playtime <- 1
+  results_red <- (list(min(red_expwins),max(red_expwins),
+               min(red_propwins),max(red_propwins),
+               min(red_playtime),max(red_playtime)))
+  results_red
+}
+
+red()
+
+no <-function(){
+  no_expwins = replicate(5, exp_bet_no()[1])
+  no_propwins = replicate(5, prop_bet_no())
+  no_playtime <- 1
+  results_no <- (list(min(no_expwins),max(no_expwins),
+               min(no_propwins),max(no_propwins),
+               min(no_playtime),max(no_playtime)))
+  results_no
+}
+
+no()
+```
+
+```{r}
+#summary report of expected winnings, proportions of wins, and playing time for game 3 
+
+mart <-function(){
+  mart_expwins = replicate(5, exp_bet_martingale()[1])
+  mart_propwins = replicate(5, prop_bet_martingale())
+  mart_playtime = replicate(5, bet_martingale()[2])
+  results_mart <- (list(min(mart_expwins),max(mart_expwins),
+               min(mart_propwins),max(mart_propwins),
+               min(mart_playtime),max(mart_playtime)))
+  results_mart
+}
+
+mart()
+```
+
+```{r}
+#summary report of expected winnings, proportions of wins, and playing time for game 4
+
+lab <-function(){
+  lab_expwins = replicate(5, exp_bet_labouchere()[1])
+  lab_propwins = replicate(5, prop_bet_labouchere())
+  lab_playtime = replicate(5, bet_labouchere()[2])
+  results_lab <- (list(min(lab_expwins),max(lab_expwins),
+               min(lab_propwins),max(lab_propwins),
+               min(lab_playtime),max(lab_playtime)))
+  results_lab
+}
+
+lab()
+```
+
+```{r}
+#calculate mean and std dev of above results for game 1
+
+red_wins <- function() {
+  g1 <- replicate(100000, bet_red()[1])
+  return(list(mean(g1), sd(g1)))
+}
+
+red_prop <- function() {
+  g2 <- replicate(100000, prop_bet_red())
+
+  return(list(mean(g1), sd(g1)))
+}
+
+red_wins()
+red_prop()
+```
+
+```{r}
+#calculate mean and std dev of above results for game 2
+
+no_wins <- function() {
+  g2 <- replicate(100000, bet_no()[1])
+  return(list(mean(g2), sd(g2)))
+}
+
+no_prop <- function() {
+  g2 <- replicate(100000, prop_bet_no())
+
+  return(list(mean(g2), sd(g2)))
+}
+
+no_wins()
+no_prop()
+```
+
+```{r}
+#calculate mean and std dev of above results for game 3
+
+mart_wins <- function() {
+  g3 <- replicate(100000, bet_martingale()[1])
+  return(list(mean(g3), sd(g3)))
+}
+
+mart_prop <- function() {
+  g3 <- replicate(100000, prop_bet_martingale())
+
+  return(list(mean(g3), sd(g3)))
+}
+
+mart_play <- function() {
+  x = replicate(100000, bet_martingale()[2])
+  return(list(mean(x), sd(x)))
+}
+
+mart_wins()
+mart_prop()
+mart_play()
+```
+
+```{r}
+#calculate mean and std dev of above results for game 4
+
+lab_wins <- function() {
+  g4 <- replicate(100000, bet_labouchere()[1])
+  return(list(mean(g4), sd(g4)))
+}
+
+lab_prop <- function() {
+  g4 <- replicate(100000, prop_bet_labouchere())
+
+  return(list(mean(g4), sd(g4)))
+}
+
+lab_play <- function() {
+  x = replicate(100000, bet_labouchere()[2])
+  return(list(mean(x), mean(y)))
+
+}
+
+lab_wins()
+lab_prop()
+lab_play()
+```
+
