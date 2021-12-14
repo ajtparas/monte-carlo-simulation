@@ -43,7 +43,7 @@ two_ball <- function(n){
   
   return(expected)
 }
-two_ball(100000)
+two_ball(10000)
 
 
 ```
@@ -251,24 +251,13 @@ martingale_twoball_earning <- function(max_initial_earning, n) {
 
 x <- martingale_twoball_earning(100, 10000)
 
-plot(
-  x$earnings,
-  x$winnings_distribution,
-  main = "Two-ball Martingale: Expected Earnings Distribution as initial Earnings Raises",
-  type = "l",
-  ylab = "Expected Earnings",
-  xlab = "Initial Earnings"
-)
 
-plot(
-  x$earnings,
-  x$plays_distribution,
-  main = "Two-ball Martingale: Expected # of plays as initial earnings raise",
-  type = "l",
-  ylab = "Number of Plays",
-  xlab = "Initial Earnings"
-)
+library(ggplot2)
 
+ggplot(x, aes(earnings, winnings_distribution)) +  geom_line() + geom_point() + ggtitle("Two-ball Martingale: Expected Earnings as initial Earnings Rise") + xlab("Initial Earnings") +ylab("Expected Earnings") 
+
+
+ggplot(x, aes(earnings, plays_distribution)) +  geom_line() + geom_point() + ggtitle("Two-ball Martingale: Plays as Initial Earnings Rise") + xlab("Initial Earnings") +ylab("Number of Plays") 
 ```
 
 
@@ -398,7 +387,7 @@ labouchere_prop <- function(n) {
   expected_earnings <- mean(cases_wins)
   prop <- length(cases_wins[cases_wins == 10]) / length(cases_wins)
   
-  return (prop)
+  return (c(prop,cases_wins))
   
 }
 
@@ -411,7 +400,7 @@ proportion of wins for labouchere two ball is .2359. Also expected to be lower s
 
 
 ```{r}
-# expected winnings by changing list of numbers ( e.g. - play games w initial list of (1,2,3), then (2,3,4) and so on. (all the way up to (34,35,36)).
+# expected winnings by changing list of initial numbers ( e.g. - play games w initial list of (1,2,3,4), then (2,3,4,5) and so on. (all the way up to (10,11,12,13)).
 
 
 labouchere_list <- function(n, initial_list_max) {
@@ -490,23 +479,12 @@ labouchere_list <- function(n, initial_list_max) {
 x <- labouchere_list(10000, 10)
 
 
-plot(
-  seq(1:10),
-  x$expected_earnings,
-  type = "l",
-  ylab = "Expected Earnings",
-  xlab = "Initial List (1 = c(1,2,3,4))",
-  main = "Two-ball Labouchere System Expected Earnings vs Initial List"
-)
 
-plot(
-  seq(1:10),
-  x$plays_distribution,
-  type = "l",
-  ylab = "Number of Plays",
-  xlab = "Initial List (1 = c(1,2,3,4))",
-  main = "Two-ball Labouchere System PLays Distribution vs Initial List"
-)
+
+library(ggplot2)
+ggplot(x, aes(seq(1:10), expected_earnings)) +  geom_line() + geom_point() + ggtitle("Two-Ball Labouchere: Expected Earnings vs Initial List") + xlab("Initial List (1 = c(1,2,3,4))") +ylab("Expected Earnings") 
+
+ggplot(x, aes(seq(1:10), plays_distribution)) +  geom_line() + geom_point() + ggtitle("Two-ball Labouchere: PLays Distribution vs Initial List") + xlab("Initial List (1 = c(1,2,3,4))") +ylab("Number of Plays") + geom_hline( yintercept = 0, color = "green")
 
 ```
 
