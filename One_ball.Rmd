@@ -193,105 +193,147 @@ prop_bet_labouchere()
 ```
 
 ```{r}
-#commented out bc runtime is long...
-#summary report of expected winnings, proportions of wins, and playing time with each type of game
-# one_ball_report<-function(){
-#   red_expwins = replicate(5, exp_bet_red()[1])
-#   no_expwins = replicate(5, exp_bet_no()[1])
-#   mart_expwins = replicate(5, exp_bet_martingale()[1])
-#   leb_expwins = replicate(5, exp_bet_labouchere()[1])
-#   red_propwins = replicate(5, prop_bet_red())
-#   no_propwins = replicate(5, prop_bet_no())
-#   mart_propwins = replicate(5, prop_bet_martingale())
-#   leb_propwins = replicate(5, prop_bet_labouchere())
-#   red_playtime <- 1
-#   no_playtime <- 1
-#   mart_playtime = replicate(5, bet_martingale()[2])
-#   leb_playtime = replicate(5, bet_labouchere()[2])
-#   return (list(min(red_expwins),max(red_expwins),
-#                min(no_expwins),max(no_expwins),
-#                min(mart_expwins),max(mart_expwins),
-#                min(leb_expwins),max(leb_expwins),
-#                min(red_propwins),max(red_propwins),
-#                min(no_propwins),max(no_propwins),
-#                min(mart_propwins),max(mart_propwins),
-#                min(leb_propwins),max(leb_propwins),
-#                min(red_playtime),max(red_playtime),
-#                min(no_playtime),max(no_playtime),
-#                min(mart_playtime),max(mart_playtime),
-#                min(leb_playtime),max(leb_playtime)))
-# }
-# 
-# one_ball_report()
+#summary report of expected winnings, proportions of wins, and playing time for game 1 and game 2
+
+red <-function(){
+  red_expwins = replicate(5, exp_bet_red()[1])
+  red_propwins = replicate(5, prop_bet_red())
+  red_playtime <- 1
+  results_red <- (list(min(red_expwins),max(red_expwins),
+               min(red_propwins),max(red_propwins),
+               min(red_playtime),max(red_playtime)))
+  results_red
+}
+
+red()
+
+no <-function(){
+  no_expwins = replicate(5, exp_bet_no()[1])
+  no_propwins = replicate(5, prop_bet_no())
+  no_playtime <- 1
+  results_no <- (list(min(no_expwins),max(no_expwins),
+               min(no_propwins),max(no_propwins),
+               min(no_playtime),max(no_playtime)))
+  results_no
+}
+
+no()
 ```
 
 ```{r}
-#commented out bc runtime is long...
-#calculate mean and std dev of above results
-# red_wins <- function() {
-#   g1 <- replicate(100000, bet_red()[1])
-#   return(list(mean(g1), sd(g1)))
-# }
-# 
-# no_wins <- function() {
-#   g2 <- replicate(100000, bet_no()[1])
-#   return(list(mean(g2), sd(g2)))
-# }
-# 
-# mart_wins <- function() {
-#   g3 <- replicate(100000, bet_martingale()[1])
-#   return(list(mean(g3), sd(g3)))
-# }
-# 
-# leb_wins <- function() {
-#   g4 <- replicate(100000, bet_labouchere()[1])
-#   return(list(mean(g4), sd(g4)))
-# }
-# 
-# red_prop <- function() {
-#   g1 <- replicate(100000, prop_bet_red())
-#   
-#   return(list(mean(g1), sd(g1)))
-# }
-# 
-# no_prop <- function() {
-#   g2 <- replicate(100000, prop_bet_no())
-#   
-#   return(list(mean(g2), sd(g2)))
-# }
-# 
-# mart_prop <- function() {
-#   g3 <- replicate(100000, prop_bet_martingale())
-#   
-#   return(list(mean(g3), sd(g3)))
-# }
-# 
-# leb_prop <- function() {
-#   g4 <- replicate(100000, prop_bet_labouchere())
-#   
-#   return(list(mean(g4), sd(g4)))
-# }
-# 
-# mart_play <- function() {
-#   x = replicate(100000, bet_martingale()[2])
-#   return(list(mean(x), sd(x)))
-# }
-# 
-# leb_play <- function() {
-#   x = replicate(100000, bet_labouchere()[2])
-#   return(list(mean(x), mean(y)))
-#   
-# }
-# 
-# red_wins()
-# no_wins()
-# mart_wins()
-# leb_wins()
-# red_prop()
-# no_prop()
-# mart_prop()
-# leb_prop()
-# mart_play()
-# leb_play()
+#summary report of expected winnings, proportions of wins, and playing time for game 3 
+
+mart <-function(){
+  mart_expwins = replicate(5, exp_bet_martingale()[1])
+  mart_propwins = replicate(5, prop_bet_martingale())
+  mart_playtime = replicate(5, bet_martingale()[2])
+  results_mart <- (list(min(mart_expwins),max(mart_expwins),
+               min(mart_propwins),max(mart_propwins),
+               min(mart_playtime),max(mart_playtime)))
+  results_mart
+}
+
+mart()
+```
+
+```{r}
+#summary report of expected winnings, proportions of wins, and playing time for game 4
+
+lab <-function(){
+  lab_expwins = replicate(5, exp_bet_labouchere()[1])
+  lab_propwins = replicate(5, prop_bet_labouchere())
+  lab_playtime = replicate(5, bet_labouchere()[2])
+  results_lab <- (list(min(lab_expwins),max(lab_expwins),
+               min(lab_propwins),max(lab_propwins),
+               min(lab_playtime),max(lab_playtime)))
+  results_lab
+}
+
+lab()
+```
+
+```{r}
+#calculate mean and std dev of above results for game 1
+
+red_wins <- function() {
+  g1 <- replicate(100000, bet_red()[1])
+  return(list(mean(g1), sd(g1)))
+}
+
+red_prop <- function() {
+  g2 <- replicate(100000, prop_bet_red())
+
+  return(list(mean(g1), sd(g1)))
+}
+
+red_wins()
+red_prop()
+```
+
+```{r}
+#calculate mean and std dev of above results for game 2
+
+no_wins <- function() {
+  g2 <- replicate(100000, bet_no()[1])
+  return(list(mean(g2), sd(g2)))
+}
+
+no_prop <- function() {
+  g2 <- replicate(100000, prop_bet_no())
+
+  return(list(mean(g2), sd(g2)))
+}
+
+no_wins()
+no_prop()
+```
+
+```{r}
+#calculate mean and std dev of above results for game 3
+
+mart_wins <- function() {
+  g3 <- replicate(100000, bet_martingale()[1])
+  return(list(mean(g3), sd(g3)))
+}
+
+mart_prop <- function() {
+  g3 <- replicate(100000, prop_bet_martingale())
+
+  return(list(mean(g3), sd(g3)))
+}
+
+mart_play <- function() {
+  x = replicate(100000, bet_martingale()[2])
+  return(list(mean(x), sd(x)))
+}
+
+mart_wins()
+mart_prop()
+mart_play()
+```
+
+```{r}
+#calculate mean and std dev of above results for game 4
+
+lab_wins <- function() {
+  g4 <- replicate(100000, bet_labouchere()[1])
+  return(list(mean(g4), sd(g4)))
+}
+
+lab_prop <- function() {
+  g4 <- replicate(100000, prop_bet_labouchere())
+
+  return(list(mean(g4), sd(g4)))
+}
+
+lab_play <- function() {
+  x = replicate(100000, bet_labouchere()[2])
+  return(list(mean(x), mean(y)))
+
+}
+
+lab_wins()
+lab_prop()
+lab_play()
 ```
 
